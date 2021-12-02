@@ -2,17 +2,14 @@
   "name": "aoc-2021",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "app.js",
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "chalk": "^5.0.0"
   },
-  "type": "module",
   "devDependencies": {
     "eslint": "^8.3.0",
     "eslint-config-prettier": "^8.3.0",

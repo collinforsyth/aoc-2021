@@ -98,4 +98,112 @@ function day_two() {
   return result;
 }
 
-console.log(day_two());
+function day_three() {
+  var result = {};
+  // read input from fs
+  input = fs.readFileSync("./data/day_three_input.txt", { encoding: "utf8" });
+
+  data = input
+    .split(os.EOL)
+    .map((o) => {
+      return parseInt(o, 2);
+    })
+    .filter((o) => !isNaN(o));
+
+  bit_counts = data.reduce(
+    (acc, o) => {
+      num = o;
+      // bitmask LSB and add to end of array
+      for (i = 11; i >= 0; i--) {
+        num & 1 ? acc[i].one_count++ : acc[i].zero_count++;
+        num = num >> 1;
+      }
+      return acc;
+    },
+    Array(12)
+      .fill()
+      .map(() => {
+        return { one_count: 0, zero_count: 0 };
+      })
+  );
+
+  part_one = bit_counts.reduce(
+    (acc, count) => {
+      if (count.one_count > count.zero_count) {
+        acc.gamma = (acc.gamma << 1) | 1;
+        acc.epsilon = acc.epsilon << 1;
+      } else {
+        acc.gamma = acc.gamma << 1;
+        acc.epsilon = (acc.epsilon << 1) | 1;
+      }
+      return acc;
+    },
+    { gamma: 0, epsilon: 0 }
+  );
+  result.part_one = part_one.epsilon * part_one.gamma;
+
+  bits = Array(12)
+    .fill()
+    .map((_, i) => {
+      return 11 - i;
+    });
+
+  const num_bits = (arr, i) => {
+    return arr.reduce(
+      (acc, o) => {
+        (o >> i) & 1 ? acc.one_count++ : acc.zero_count++;
+        return acc;
+      },
+      { zero_count: 0, one_count: 0 }
+    );
+  };
+
+  const bit_filter = (arr, i, keep) => {
+    return arr.filter((o) => ((o >> i) & 1) == keep);
+  };
+
+  part_two = bits.reduce(
+    (acc, b) => {
+      if (
+        acc.oxygen_generator_rating.length == 1 &&
+        acc.co2_scrubber_rating.length == 1
+      ) {
+        return acc;
+      }
+      oxygen_msb = num_bits(acc.oxygen_generator_rating, b);
+      co2_msb = num_bits(acc.co2_scrubber_rating, b);
+
+      if (acc.oxygen_generator_rating != 1) {
+        if (oxygen_msb.one_count >= oxygen_msb.zero_count) {
+          acc.oxygen_generator_rating = bit_filter(
+            acc.oxygen_generator_rating,
+            b,
+            1
+          );
+        } else {
+          acc.oxygen_generator_rating = bit_filter(
+            acc.oxygen_generator_rating,
+            b,
+            0
+          );
+        }
+      }
+      if (acc.co2_scrubber_rating.length != 1) {
+        if (co2_msb.zero_count <= co2_msb.one_count) {
+          acc.co2_scrubber_rating = bit_filter(acc.co2_scrubber_rating, b, 0);
+        } else {
+          acc.co2_scrubber_rating = bit_filter(acc.co2_scrubber_rating, b, 1);
+        }
+      }
+      return acc;
+    },
+    { oxygen_generator_rating: data, co2_scrubber_rating: data }
+  );
+
+  result.part_two =
+    part_two.oxygen_generator_rating[0] * part_two.co2_scrubber_rating[0];
+
+  return result;
+}
+
+console.log(day_three());
